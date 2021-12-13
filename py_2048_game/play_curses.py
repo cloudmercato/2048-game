@@ -1,5 +1,7 @@
 import curses
 from curses.textpad import rectangle
+import argparse
+
 from py_2048_game.core import Game
 
 KEYS = {
@@ -9,13 +11,10 @@ KEYS = {
     curses.KEY_DOWN: 3,
 }
 
-def main():
-    stdscr = curses.initscr()
-    stdscr.keypad(True)
+def main(stdscr, seed=None):
     stdscr.clear()
-    curses.noecho()
 
-    game = Game()
+    game = Game(seed=seed)
     rectangle(stdscr, 0, 0, 2+3, 2+8)
 
     while 1:
@@ -43,8 +42,16 @@ def main():
 
         stdscr.refresh()
 
+parser = argparse.ArgumentParser()
+parser.add_argument('-s', '--seed', type=int)
+
+
 if __name__ == '__main__':
+    args = parser.parse_args()
     try:
-        main()
+        curses.wrapper(
+            main,
+            seed=args.seed,
+        )
     except KeyboardInterrupt:
         pass
