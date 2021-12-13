@@ -21,8 +21,8 @@ def main():
     while 1:
         for i, (a, b, c, d) in enumerate(game._state):
             stdscr.addstr(i+1, 2, '%s %s %s %s' % (a, b, c, d))
-        stdscr.addstr(6, 0, 'Round: %s' % game.round)
-        stdscr.addstr(7, 0, 'Score: %s' % game._score)
+        stdscr.addstr(6, 0, 'Round: %s' % game.move_count)
+        stdscr.addstr(7, 0, 'Score: %s' % game.score)
 
         while 1:
             key = stdscr.getch()
