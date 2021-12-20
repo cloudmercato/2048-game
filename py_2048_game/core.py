@@ -32,23 +32,28 @@ class Game:
         """
 
         self.score = initial_score
+        self.history = {}
 
         if state is None:
-            self._state = np.zeros((4, 4), dtype=int)
+            self.state = np.zeros((4, 4), dtype=int)
             self.add_random_tile()
             self.add_random_tile()
         else:
-            self._state = state
+            self.state = state
         self._seed = seed
         if seed is not None:
             np.random.seed(seed)
         self.move_count = 0
+        self._record()
+
+    def _record(self):
+        self.history[self.move_count] = ((self.state.copy(), self.move_count, self.score))
 
     def copy(self, seed=None):
         """Return a copy of self."""
         seed = seed or self._seed
         return Game(
-            np.copy(self._state),
+            np.copy(self.state),
             self.score,
             seed=seed,
         )
@@ -72,7 +77,7 @@ class Game:
         That is, executing it would change the state.
         """
 
-        temp_state = np.rot90(self._state, action)
+        temp_state = np.rot90(self.state, action)
         return self._is_action_available_left(temp_state)
 
     def _is_action_available_left(self, state):
@@ -96,13 +101,14 @@ class Game:
     def do_action(self, action):
         """Execute action, add a new tile, update the score & return the reward."""
 
-        temp_state = np.rot90(self._state, action)
+        temp_state = np.rot90(self.state, action)
         reward = self._do_action_left(temp_state)
-        self._state = np.rot90(temp_state, -action)
+        self.state = np.rot90(temp_state, -action)
         self.score += reward
         self.move_count += 1
 
         self.add_random_tile()
+        self._record()
 
         return reward
 
@@ -140,7 +146,7 @@ class Game:
 
     def add_random_tile(self):
         """Adds a random tile to the grid. Assumes that it has empty fields."""
-        x_pos, y_pos = np.where(self._state == 0)
+        x_pos, y_pos = np.where(self.state == 0)
 
         # Rerurn if no suitable tile exists.
         if len(x_pos) == 0:
@@ -149,8 +155,22 @@ class Game:
         empty_index = np.random.choice(len(x_pos))
         value = np.random.choice([1, 2], p=[0.9, 0.1])
 
-        self._state[x_pos[empty_index], y_pos[empty_index]] = value
+        self.state[x_pos[empty_index], y_pos[empty_index]] = value
 
-    def state(self):
-        """Return current state."""
-        return self._state
+    def undo(self, step=1):
+        index = self.move_count - step
+        if index not in self.history:
+            return
+        state, move_count, score = self.history[index]
+        self.score = score
+        self.move_count = move_count
+        self.state = state.copy()
+
+    def redo(self, step=1):
+        index = self.move_count + step
+        if index not in self.history:
+            return
+        state, move_count, score = self.history[index]
+        self.score = score
+        self.move_count = move_count
+        self.state = state.copy()
