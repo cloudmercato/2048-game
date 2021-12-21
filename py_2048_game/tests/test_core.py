@@ -16,6 +16,15 @@ class GameInitTest(TestCase):
 
 
 class GameTest(TestCase):
+    def test_reset(self):
+        game = core.Game(keep_history=True)
+        for i in range(3):
+            game.do_action(i)
+        game.reset()
+        self.assertEqual(game.score, 0)
+        self.assertEqual(game.move_count, 0)
+        self.assertEqual(len(game.history), 1)
+
     def test_copy(self):
         game = core.Game()
         game2 = game.copy()
@@ -101,3 +110,59 @@ class GameAvailableActionsTest(TestCase):
         state[1::2,1::2] = 32
         game = core.Game(state=state)
         self.assertFalse(game.available_actions(), game.state)
+
+
+class GameIsActionAvailableLeftTest(TestCase):
+    def test_full(self):
+        state = np.arange(1, 17).reshape((4, 4))
+        game = core.Game(state=state)
+        avai = game._is_action_available_left(state)
+        self.assertFalse(avai, game.state)
+
+    def test_full_mergeable(self):
+        state = np.arange(1, 17).reshape((4, 4))
+        state[0] = 1
+        game = core.Game(state=state)
+        avai = game._is_action_available_left(state)
+        self.assertTrue(avai, game.state)
+
+    def test_empty_top_left(self):
+        state = np.arange(16).reshape((4, 4))
+        game = core.Game(state=state)
+        avai = game._is_action_available_left(state)
+        self.assertTrue(avai, game.state)
+
+    def test_mergeable_top_left(self):
+        state = np.arange(16).reshape((4, 4))
+        state[0, 0] = 1
+        game = core.Game(state=state)
+        avai = game._is_action_available_left(state)
+        self.assertTrue(avai, game.state)
+
+    def test_empty_top(self):
+        state = np.arange(1, 17).reshape((4, 4))
+        state[0, 1] = 0
+        game = core.Game(state=state)
+        avai = game._is_action_available_left(state)
+        self.assertTrue(avai, game.state)
+
+    def test_mergeable_top(self):
+        state = np.arange(1, 17).reshape((4, 4))
+        state[0, 1] = 3
+        game = core.Game(state=state)
+        avai = game._is_action_available_left(state)
+        self.assertTrue(avai, game.state)
+
+    def test_empty_top_right(self):
+        state = np.arange(1, 17).reshape((4, 4))
+        state[0, 3] = 0
+        game = core.Game(state=state)
+        avai = game._is_action_available_left(state)
+        self.assertFalse(avai, game.state)
+
+    def test_mergeable_top_right(self):
+        state = np.arange(1, 17).reshape((4, 4))
+        state[0, 3] = 3
+        game = core.Game(state=state)
+        avai = game._is_action_available_left(state)
+        self.assertTrue(avai, game.state)

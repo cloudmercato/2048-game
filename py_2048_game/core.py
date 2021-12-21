@@ -68,6 +68,7 @@ class Game:
         self.add_random_tile()
         self.move_count = 0
         self.score = 0
+        self.history = {}
         self._record()
 
     def game_over(self):
