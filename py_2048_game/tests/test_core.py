@@ -1,6 +1,6 @@
 from unittest import TestCase
-import numpy as np
 from py_2048_game import core
+from py_2048_game.xp import xp as np
 
 
 class GameInitTest(TestCase):
