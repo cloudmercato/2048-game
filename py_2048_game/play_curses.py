@@ -18,16 +18,17 @@ ACTIONS = {
     117: 'undo',
 }
 
-def curses_main(stdscr, seed=None, solver=None):
+def curses_main(stdscr, seed=None, solver=None, keep_history=True):
     stdscr.clear()
 
     if solver is not None:
         stdscr.addstr(1, 13, '(s)olve')
-    stdscr.addstr(2, 13, '(u)ndo')
-    stdscr.addstr(3, 13, '(r)edo')
+    if keep_history:
+        stdscr.addstr(2, 13, '(u)ndo')
+        stdscr.addstr(3, 13, '(r)edo')
     stdscr.addstr(5, 13, '(q)uit')
 
-    game = Game(seed=seed)
+    game = Game(seed=seed, keep_history=keep_history)
     rectangle(stdscr, 0, 0, 2+3, 2+8)
 
     while 1:
@@ -47,12 +48,12 @@ def curses_main(stdscr, seed=None, solver=None):
             reward = game.do_action(action)
         elif key == 113:
             raise KeyboardInterrupt()
-        elif key == 114:
+        elif key == 114 and keep_history:
             game.redo()
+        elif key == 117 and keep_history:
+            game.undo()
         elif key == 115:
             _, _, reward = solver.solve(game)
-        elif key == 117:
-            game.undo()
 
         if reward:
             stdscr.addstr(8, 6, '+%d' % reward)
@@ -76,6 +77,7 @@ def main(**kwargs):
             curses_main,
             seed=kwargs.get('seed'),
             solver=kwargs.get('solver'),
+            keep_history=kwargs.get('keep_history'),
         )
     except KeyboardInterrupt:
         pass

@@ -22,7 +22,7 @@ class Game:
     for empty fields and ln2(value) for any tiles.
     """
 
-    def __init__(self, state=None, initial_score=0, seed=None):
+    def __init__(self, state=None, initial_score=0, seed=None, keep_history=True):
         """Init the Game object.
 
         Args:
@@ -34,6 +34,7 @@ class Game:
 
         self.score = initial_score
         self.history = {}
+        self.keep_history = keep_history
 
         if state is None:
             self.state = np.zeros((4, 4), dtype=int)
@@ -48,6 +49,8 @@ class Game:
         self._record()
 
     def _record(self):
+        if not self.keep_history:
+            return
         self.history[self.move_count] = ((self.state.copy(), self.move_count, self.score))
 
     def copy(self, seed=None):
@@ -58,6 +61,14 @@ class Game:
             self.score,
             seed=seed,
         )
+
+    def reset(self):
+        self.state[:] = 0
+        self.add_random_tile()
+        self.add_random_tile()
+        self.move_count = 0
+        self.score = 0
+        self._record()
 
     def game_over(self):
         """Whether the game is over."""
@@ -159,6 +170,8 @@ class Game:
         self.state[x_pos[empty_index], y_pos[empty_index]] = value
 
     def undo(self, step=1):
+        if not self.keep_history:
+            return
         index = self.move_count - step
         if index not in self.history:
             return
@@ -168,6 +181,8 @@ class Game:
         self.state = state.copy()
 
     def redo(self, step=1):
+        if not self.keep_history:
+            return
         index = self.move_count + step
         if index not in self.history:
             return
