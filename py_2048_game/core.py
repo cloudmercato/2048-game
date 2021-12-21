@@ -1,7 +1,7 @@
 """Game class to represent 2048 game state."""
 
 import logging
-import numpy as np
+from py_2048_game.xp import xp as np
 
 ACTION_LEFT = 0
 ACTION_UP = 1

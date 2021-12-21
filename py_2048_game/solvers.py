@@ -1,5 +1,5 @@
 import importlib
-import numpy as np
+from py_2048_game.xp import xp as np
 
 
 class BaseSolver:
