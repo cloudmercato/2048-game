@@ -1,5 +1,6 @@
 import importlib
 from py_2048_game.xp import xp as np
+from py_2048_game import utils
 
 
 class BaseSolver:
@@ -14,7 +15,7 @@ class BaseSolver:
 class RandomSolver(BaseSolver):
     def solve(self, game):
         avai_actions = game.available_actions()
-        action = np.random.choice(avai_actions)
+        action = utils.random_choice(avai_actions)
         reward = game.do_action(action)
         return (
             game.state,

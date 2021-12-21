@@ -2,6 +2,7 @@
 
 import logging
 from py_2048_game.xp import xp as np
+from py_2048_game import utils
 
 ACTION_LEFT = 0
 ACTION_UP = 1
@@ -152,8 +153,8 @@ class Game:
         if len(x_pos) == 0:
             return
 
-        empty_index = np.random.choice(len(x_pos))
-        value = np.random.choice([1, 2], p=[0.9, 0.1])
+        empty_index = utils.random_choice(len(x_pos))
+        value = utils.random_choice([1, 2], p=[0.9, 0.1])
 
         self.state[x_pos[empty_index], y_pos[empty_index]] = value
 
