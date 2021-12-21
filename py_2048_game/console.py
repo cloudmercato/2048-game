@@ -1,0 +1,36 @@
+import os
+import argparse
+import logging
+
+from py_2048_game import play_curses
+from py_2048_game import solvers
+from py_2048_game import Game
+
+logger = logging.getLogger('py2048_game')
+
+parser = argparse.ArgumentParser()
+parser.add_argument('action', default='solver', choices=('curses', 'solver'), nargs='?')
+parser.add_argument('--solver', default='py_2048_game.solvers.RandomSolver')
+parser.add_argument('--verbose', '-v', default=3, type=int)
+
+
+def main():
+    args = parser.parse_args()
+
+    log_verbose = 50 - (args.verbose*10)
+    log_handler = logging.StreamHandler()
+    log_handler.setLevel(log_verbose)
+    logger.addHandler(log_handler)
+    logger.setLevel(log_verbose)
+
+    if args.action == 'curses':
+        play_curses.main()
+    elif args.action == 'solver':
+        solver = solvers.get_solver(args.solver)()
+        game = Game()
+        for _, action, reward in solver.solve_game(game):
+            logger.debug('Move: %s Score: %s', game.move_count, game.score)
+        logger.info('Score: %s', game.score)
+
+if __name__ == "__main__":
+    main()

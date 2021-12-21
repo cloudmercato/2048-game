@@ -16,7 +16,7 @@ ACTIONS = {
     117: 'undo',
 }
 
-def main(stdscr, seed=None):
+def curses_main(stdscr, seed=None):
     stdscr.clear()
 
     stdscr.addstr(1, 13, 'Undo: u')
@@ -59,13 +59,18 @@ def main(stdscr, seed=None):
 parser = argparse.ArgumentParser()
 parser.add_argument('-s', '--seed', type=int)
 
-
-if __name__ == '__main__':
-    args = parser.parse_args()
+def main(**kwargs):
     try:
         curses.wrapper(
-            main,
-            seed=args.seed,
+            curses_main,
+            seed=kwargs.get('seed'),
         )
     except KeyboardInterrupt:
         pass
+
+
+if __name__ == '__main__':
+    args = parser.parse_args()
+    main(
+        seed=args.seed,
+    )
