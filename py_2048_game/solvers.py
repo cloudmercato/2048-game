@@ -24,7 +24,9 @@ class RandomSolver(BaseSolver):
         )
 
 
-def get_solver(path):
+def get_solver(path=None):
+    if path is None:
+        return RandomSolver
     class_name = path.split('.')[-1]
     module_path = '.'.join([i for i in path.split('.')][:-1])
     solvers = importlib.import_module(module_path)
