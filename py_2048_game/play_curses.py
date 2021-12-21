@@ -12,15 +12,20 @@ MOVES = {
     curses.KEY_DOWN: 3,
 }
 ACTIONS = {
+    113: 'quit',
     114: 'redo',
+    115: 'solve',
     117: 'undo',
 }
 
-def curses_main(stdscr, seed=None):
+def curses_main(stdscr, seed=None, solver=None):
     stdscr.clear()
 
-    stdscr.addstr(1, 13, 'Undo: u')
-    stdscr.addstr(2, 13, 'Redo: r')
+    if solver is not None:
+        stdscr.addstr(1, 13, '(s)olve')
+    stdscr.addstr(2, 13, '(u)ndo')
+    stdscr.addstr(3, 13, '(r)edo')
+    stdscr.addstr(5, 13, '(q)uit')
 
     game = Game(seed=seed)
     rectangle(stdscr, 0, 0, 2+3, 2+8)
@@ -31,6 +36,7 @@ def curses_main(stdscr, seed=None):
         stdscr.addstr(6, 0, 'Round: %s' % game.move_count)
         stdscr.addstr(7, 0, 'Score: %s' % game.score)
 
+        reward = 0
         while 1:
             key = stdscr.getch()
             if key in MOVES or key in ACTIONS:
@@ -39,20 +45,25 @@ def curses_main(stdscr, seed=None):
         if key in MOVES:
             action = MOVES[key]
             reward = game.do_action(action)
-            if reward:
-                stdscr.addstr(8, 6, '+%d' % reward)
-            else:
-                stdscr.addstr(8, 6, ' '*10)
-        elif key == 117:
-            game.undo()
+        elif key == 113:
+            raise KeyboardInterrupt()
         elif key == 114:
             game.redo()
+        elif key == 115:
+            _, _, reward = solver.solve(game)
+        elif key == 117:
+            game.undo()
+
+        if reward:
+            stdscr.addstr(8, 6, '+%d' % reward)
+        else:
+            stdscr.addstr(8, 6, ' '*10)
 
         if game.game_over():
             stdscr.addstr(9, 0, 'GAME OVER')
             stdscr.getch()
-            break
             time.sleep(3)
+            break
 
         stdscr.refresh()
 
@@ -64,6 +75,7 @@ def main(**kwargs):
         curses.wrapper(
             curses_main,
             seed=kwargs.get('seed'),
+            solver=kwargs.get('solver'),
         )
     except KeyboardInterrupt:
         pass

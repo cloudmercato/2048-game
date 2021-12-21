@@ -24,7 +24,10 @@ def main():
     logger.setLevel(log_verbose)
 
     if args.action == 'curses':
-        play_curses.main()
+        solver = solvers.get_solver(args.solver)()
+        play_curses.main(
+            solver=solver,
+        )
     elif args.action == 'solver':
         solver = solvers.get_solver(args.solver)()
         game = Game()
