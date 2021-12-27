@@ -111,7 +111,6 @@ class Game:
 
         return False
 
-
     def do_action(self, action):
         """Execute action, add a new tile, update the score & return the reward."""
 
