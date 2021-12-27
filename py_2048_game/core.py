@@ -1,6 +1,7 @@
 """Game class to represent 2048 game state."""
 
 import logging
+import importlib
 from py_2048_game.xp import xp as np
 from py_2048_game import utils
 
@@ -166,7 +167,7 @@ class Game:
             return
 
         empty_index = utils.random_choice(len(x_pos))
-        value = utils.random_choice([1, 2], p=[0.9, 0.1])
+        value = utils.random_choice([2, 2], p=[0.9, 0.1])
 
         self.state[x_pos[empty_index], y_pos[empty_index]] = value
 
@@ -191,3 +192,16 @@ class Game:
         self.score = score
         self.move_count = move_count
         self.state = state.copy()
+
+
+DEFAULT_GAME = Game
+
+
+def get_game_class(path=None):
+    if path is None:
+        return DEFAULT_GAME
+    class_name = path.split('.')[-1]
+    module_path = '.'.join([i for i in path.split('.')][:-1])
+    module = importlib.import_module(module_path)
+    klass = getattr(module, class_name)
+    return klass
